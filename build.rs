@@ -1,4 +1,5 @@
 use fs::File;
+use io::BufRead;
 use io::Read;
 use os::unix::fs::OpenOptionsExt;
 use path::{Path, PathBuf};
@@ -65,6 +66,20 @@ fn resolve_gitdir() -> Result<PathBuf> {
     }
 }
 
+fn hook_already_exists(hook: &Path) -> bool {
+    let f = match File::open(hook) {
+        Ok(f) => f,
+        Err(..) => return false,
+    };
+    match io::BufReader::new(f).lines().nth(2) {
+        None | Some(Err(..)) => false,
+        Some(Ok(line)) => {
+            let ver_comment = format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION"));
+            line.contains(&ver_comment)
+        }
+    }
+}
+
 fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
     writeln!(
         w,
@@ -108,8 +123,10 @@ fn install(hook: &str) -> Result<()> {
         p.push(hook);
         p
     };
-    let mut f = create_script(hook_path.as_path())?;
-    write_script(&mut f)?;
+    if !hook_already_exists(hook_path.as_path()) {
+        let mut f = create_script(hook_path.as_path())?;
+        write_script(&mut f)?;
+    }
     Ok(())
 }
 
