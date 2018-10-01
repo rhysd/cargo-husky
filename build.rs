@@ -110,8 +110,9 @@ fn create_script(path: &Path) -> io::Result<File> {
 #[cfg(not(target_os = "win32"))]
 fn create_script(path: &Path) -> io::Result<File> {
     fs::OpenOptions::new()
-        .create(true)
         .write(true)
+        .create(true)
+        .truncate(true)
         .mode(0o755)
         .open(path)
 }
