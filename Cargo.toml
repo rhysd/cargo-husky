@@ -1,6 +1,6 @@
 [package]
 name = "cargo-husky"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["rhysd <lin90162@yahoo.co.jp>"]
 description = "husky for cargo"
 license = "MIT"
