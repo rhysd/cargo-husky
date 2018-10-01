@@ -26,9 +26,9 @@ impl fmt::Debug for Error {
                     .map(|p| p.to_string_lossy().to_string())
                     .unwrap_or_else(|e| format!("{}", e));
                 format!(
-                    ".git directory was not found in {} or its parent directories (target dir: {})",
+                    ".git directory was not found in {} or its parent directories (outdir: {})",
                     cwd,
-                    env::var("CARGO_TARGET_DIR").unwrap_or("".to_string()),
+                    env::var("OUT_DIR").unwrap_or("".to_string()),
                 )
             }
             Error::Io(inner) => format!("IO error: {}", inner),
@@ -75,11 +75,11 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
 set -e
 cargo test
 "#,
-        env::var("CARGO_PKG_VERSION").unwrap_or("".to_string()),
-        env::var("CARGO_PKG_HOMEPAGE").unwrap_or("".to_string()),
-        env::var("CARGO_MANIFEST_DIR").unwrap_or("".to_string()),
+        env!("CARGO_PKG_VERSION"),
+        env!("CARGO_PKG_HOMEPAGE"),
+        env!("CARGO_MANIFEST_DIR"),
         path::MAIN_SEPARATOR,
-        env::var("CARGO_TARGET_DIR").unwrap_or("".to_string()),
+        env::var("OUT_DIR").unwrap_or("".to_string()),
     )?;
     Ok(())
 }
