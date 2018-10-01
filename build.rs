@@ -20,7 +20,16 @@ impl From<io::Error> for Error {
 impl fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let msg = match self {
-            Error::GitDirNotFound => ".git directory was not found".to_string(),
+            Error::GitDirNotFound => {
+                let cwd = env::current_dir()
+                    .and_then(|d| fs::canonicalize(d))
+                    .map(|p| p.to_string_lossy().to_string())
+                    .unwrap_or_else(|e| format!("{}", e));
+                format!(
+                    ".git directory was not found in {} or its parent directories",
+                    cwd
+                )
+            }
             Error::Io(inner) => format!("IO error: {}", inner),
         };
         write!(f, "{}", msg)
