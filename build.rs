@@ -149,5 +149,8 @@ fn main() -> Result<()> {
     if cfg!(feature = "precommit-hook") {
         install("pre-commit")?;
     }
+    if cfg!(feature = "postmerge-hook") {
+        install("post-merge")?;
+    }
     Ok(())
 }

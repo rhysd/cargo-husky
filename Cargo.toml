@@ -1,6 +1,6 @@
 [package]
 name = "cargo-husky"
-version = "0.0.5"
+version = "0.0.6"
 authors = ["rhysd <lin90162@yahoo.co.jp>"]
 description = "husky for cargo"
 repository = "https://github.com/rhysd/cargo-husky"
@@ -16,6 +16,7 @@ include = ["build.rs", "LICENSE.txt", "Cargo.toml", "src/**/*.rs"]
 default = ["prepush-hook", "run-cargo-test"]
 prepush-hook = []
 precommit-hook = []
+postmerge-hook = []
 run-cargo-test = []
 run-cargo-clippy = []
 
