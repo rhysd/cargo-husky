@@ -4,7 +4,11 @@ version = "0.0.5"
 authors = ["rhysd <lin90162@yahoo.co.jp>"]
 description = "husky for cargo"
 repository = "https://github.com/rhysd/cargo-husky"
-license = "MIT"
+homepage = "https://github.com/rhysd/cargo-husky#readme"
+readme = "README.md"
+keywords = ["git", "hook", "cargo"]
+categories = ["development-tools"]
+license-file = "LICENSE.txt"
 build = "build.rs"
 include = ["build.rs", "LICENSE.txt", "Cargo.toml", "src/**/*.rs"]
 
