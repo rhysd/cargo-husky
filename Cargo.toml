@@ -12,4 +12,11 @@ license-file = "LICENSE.txt"
 build = "build.rs"
 include = ["build.rs", "LICENSE.txt", "Cargo.toml", "src/**/*.rs"]
 
+[features]
+default = ["prepush-hook", "run-cargo-test"]
+prepush-hook = []
+precommit-hook = []
+run-cargo-test = []
+run-cargo-clippy = []
+
 [dependencies]

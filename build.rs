@@ -81,6 +81,17 @@ fn hook_already_exists(hook: &Path) -> bool {
 }
 
 fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
+    let script = {
+        let mut s = String::new();
+        if cfg!(feature = "run-cargo-test") {
+            s += "\ncargo test";
+        }
+        if cfg!(feature = "run-cargo-clippy") {
+            s += "\ncargo clippy";
+        }
+        s
+    };
+
     writeln!(
         w,
         r#"#!/bin/sh
@@ -91,13 +102,13 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
 #
 
 set -e
-cargo test
-"#,
+{}"#,
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_HOMEPAGE"),
         env!("CARGO_MANIFEST_DIR"),
         path::MAIN_SEPARATOR,
         env::var("OUT_DIR").unwrap_or("".to_string()),
+        script
     )?;
     Ok(())
 }
@@ -132,5 +143,11 @@ fn install(hook: &str) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    install("pre-push")
+    if cfg!(feature = "prepush-hook") {
+        install("pre-push")?;
+    }
+    if cfg!(feature = "precommit-hook") {
+        install("pre-commit")?;
+    }
+    Ok(())
 }
