@@ -21,3 +21,7 @@ run-cargo-test = []
 run-cargo-clippy = []
 
 [dependencies]
+
+[dev-dependencies]
+libc = "0.2.43"
+lazy_static = "1.1"
