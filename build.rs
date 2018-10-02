@@ -84,10 +84,10 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
     let script = {
         let mut s = String::new();
         if cfg!(feature = "run-cargo-test") {
-            s += "\ncargo test";
+            s += "\necho '+cargo test'\ncargo test";
         }
         if cfg!(feature = "run-cargo-clippy") {
-            s += "\ncargo clippy";
+            s += "\necho '+cargo clippy'\ncargo clippy";
         }
         s
     };
