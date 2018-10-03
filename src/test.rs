@@ -9,11 +9,11 @@ lazy_static! {
     static ref TMPDIR_ROOT: PathBuf = {
         let mut tmp = env::temp_dir();
         tmp.push("cargo-husky-test");
-        ensure_empty_dir(tmp.as_path());
+        ensure_empty_dir(&tmp);
 
-        // unsafe {
-        //     ::libc::atexit(cleanup_tmpdir);
-        // }
+        unsafe {
+            ::libc::atexit(cleanup_tmpdir);
+        }
 
         tmp
     };
@@ -39,7 +39,7 @@ fn ensure_empty_dir(path: &Path) {
 
 fn tmpdir_for(name: &str) -> PathBuf {
     let tmp = TMPDIR_ROOT.join(name);
-    ensure_empty_dir(tmp.as_path());
+    ensure_empty_dir(&tmp);
     tmp
 }
 
@@ -74,7 +74,7 @@ fn cargo_project_for(name: &str) -> PathBuf {
     let dir = tmpdir_for(name);
     run_cargo(&dir, &["init", "--lib"]);
 
-    let mut cargo_toml = open_cargo_toml(dir.as_path());
+    let mut cargo_toml = open_cargo_toml(&dir);
     writeln!(
         cargo_toml,
         "\n\n[patch.crates-io]\ncargo-husky = {{ path = \"{}\" }}\n\n[dev-dependencies.cargo-husky]\nversion = \"{}\"",
@@ -129,7 +129,7 @@ fn decrease_patch(mut ver: SemVer) -> SemVer {
 fn default_behavior() {
     let root = cargo_project_for("default");
     run_cargo(&root, &["test"]);
-    let script = get_hook_script(root.as_path(), "pre-push").unwrap();
+    let script = get_hook_script(&root, "pre-push").unwrap();
 
     assert_eq!(script.lines().nth(0).unwrap(), "#!/bin/sh");
     assert!(
@@ -142,22 +142,22 @@ fn default_behavior() {
     assert_eq!(script.lines().filter(|l| *l == "cargo test").count(), 1);
     assert!(script.lines().all(|l| l != "cargo clippy"));
 
-    assert_eq!(get_hook_script(root.as_path(), "pre-commit"), None);
+    assert_eq!(get_hook_script(&root, "pre-commit"), None);
 }
 
 #[test]
 fn change_features() {
     let root = cargo_project_for("features");
-    let mut cargo_toml = open_cargo_toml(root.as_path());
+    let mut cargo_toml = open_cargo_toml(&root);
     writeln!(
         cargo_toml,
         "default-features = false\nfeatures = [\"precommit-hook\", \"run-cargo-clippy\"]"
     );
     run_cargo(&root, &["test"]);
 
-    assert_eq!(get_hook_script(root.as_path(), "pre-push"), None);
+    assert_eq!(get_hook_script(&root, "pre-push"), None);
 
-    let script = get_hook_script(root.as_path(), "pre-commit").unwrap();
+    let script = get_hook_script(&root, "pre-commit").unwrap();
     assert!(script.lines().all(|l| l != "cargo test"));
     assert_eq!(script.lines().filter(|l| *l == "cargo clippy").count(), 1);
 }
@@ -167,7 +167,7 @@ fn hook_not_updated_twice() {
     let root = cargo_project_for("not-update-twice");
     run_cargo(&root, &["test"]);
 
-    let prepush_path = hook_path(root.as_path(), "pre-push");
+    let prepush_path = hook_path(&root, "pre-push");
 
     let first = File::open(&prepush_path)
         .unwrap()
@@ -201,8 +201,8 @@ fn regenerate_hook_script_on_package_update() {
 
     run_cargo(&root, &["test"]);
 
-    let prepush_path = hook_path(root.as_path(), "pre-push");
-    let script = get_hook_script(root.as_path(), "pre-push").unwrap();
+    let prepush_path = hook_path(&root, "pre-push");
+    let script = get_hook_script(&root, "pre-push").unwrap();
 
     // Replace version string in hook to older version
     let before = format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION"));
@@ -241,7 +241,7 @@ fn regenerate_hook_script_on_package_update() {
     assert_ne!(modified_before, modified_after);
 
     // Check the version is updated in hook script
-    let script = get_hook_script(root.as_path(), "pre-push").unwrap();
+    let script = get_hook_script(&root, "pre-push").unwrap();
     assert!(
         script
             .lines()

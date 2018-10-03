@@ -150,8 +150,8 @@ fn install(hook: &str) -> Result<()> {
         p.push(hook);
         p
     };
-    if !hook_already_exists(hook_path.as_path()) {
-        let mut f = create_script(hook_path.as_path())?;
+    if !hook_already_exists(&hook_path) {
+        let mut f = create_script(&hook_path)?;
         write_script(&mut f)?;
     }
     Ok(())
