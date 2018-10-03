@@ -250,3 +250,6 @@ fn regenerate_hook_script_on_package_update() {
             .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str())
     );
 }
+
+// TODO: Test foregin hook script is already there which has less than 2 lines
+// TODO: Test foregin hook script is already there which has more than 2 lines
