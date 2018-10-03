@@ -6,4 +6,7 @@ extern crate lazy_static;
 extern crate libc;
 
 #[cfg(test)]
+extern crate semver;
+
+#[cfg(test)]
 mod test;
