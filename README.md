@@ -1,5 +1,5 @@
-Husky for Cargo
-===============
+Husky for Cargo :dog:
+=====================
 
 **This package is under construction and not ready for production until version 1.0.0 is released.**
 
@@ -9,9 +9,10 @@ version of [husky][].
 cargo-husky is a development tool to set Git hook automatically on `cargo test`. By hooking `pre-push`
 and run `cargo test` automatically, it prevents broken codes from being pushed to a remote repository.
 
+
 ## Usage
 
-Please add `cargo-husky` crate to `dev-dependencies` section of your project's `Cargo.toml`.
+Please add `cargo-husky` crate to `[dev-dependencies]` section of your project's `Cargo.toml`.
 
 ```toml
 [dev-dependencies]
@@ -25,6 +26,7 @@ $ cargo test
 ```
 
 Check Git hook is generated at `.git/hooks/pre-push`.
+
 
 ## Customize behavior
 
@@ -53,9 +55,10 @@ All features are follows:
 | `run-cargo-test`   | Run `cargo test` in hook scripts   | Enabled  |
 | `run-cargo-clippy` | Run `cargo clippy` in hook scripts | Disabled |
 
+
 ## How It Works
 
-cargo-husky sets Git hook automatically on running tests by using [build scripts of cargo][build scripts].
+cargo-husky sets Git hook automatically on running tests by using [build scripts][].
 
 Build scripts are intended to be used for building third-party non-Rust code such as C libraries.
 They are automatically run on compiling crates.
@@ -63,8 +66,9 @@ They are automatically run on compiling crates.
 If `cargo-husky` crate is added to `dev-dependencies` section, it is compiled at running tests.
 At the timing, [build script](./build.rs) is run and sets Git hook automatically.
 
-cargo-husky puts Git hook file only once for the same version. When cargo-husky is updated to a new
-version, it overwrites the existing hook.
+cargo-husky puts Git hook file only once for the same version. When it is updated to a new version,
+it overwrites the existing hook by detecting itself was updated.
+
 
 ## License
 
