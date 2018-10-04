@@ -251,60 +251,44 @@ fn regenerate_hook_script_on_package_update() {
     );
 }
 
-#[test]
-fn another_hook_less_than_3_lines_already_exists() {
-    let root = cargo_project_for("another-hook-script-less-than-3-lines");
-    let prepush_path = hook_path(&root, "pre-push");
-    let content = "#!/bin/sh\necho 'hook put by someone else'".to_string();
-    let modified_before = {
-        let mut f = File::create(&prepush_path).unwrap();
-        writeln!(f, "{}", content);
-        f.metadata().unwrap().modified().unwrap()
+macro_rules! another_hook_test {
+    ($testcase:ident, $content:expr) => {
+        #[test]
+        fn $testcase() {
+            let root = cargo_project_for(stringify!($testcase));
+            let prepush_path = hook_path(&root, "pre-push");
+            let content = $content.to_string();
+            let modified_before = {
+                let mut f = File::create(&prepush_path).unwrap();
+                writeln!(f, "{}", content);
+                f.metadata().unwrap().modified().unwrap()
+            };
+
+            // Ensure modified time differs from previous if file were updated
+            thread::sleep(time::Duration::from_secs(1));
+
+            run_cargo(&root, &["test"]);
+
+            let modified_after = File::open(&prepush_path)
+                .unwrap()
+                .metadata()
+                .unwrap()
+                .modified()
+                .unwrap();
+
+            assert_eq!(modified_before, modified_after);
+
+            let script = get_hook_script(&root, "pre-push").unwrap();
+            assert_eq!(content + "\n", script);
+        }
     };
-
-    // Ensure modified time differs from previous if file were updated
-    thread::sleep(time::Duration::from_secs(1));
-
-    run_cargo(&root, &["test"]);
-
-    let modified_after = File::open(&prepush_path)
-        .unwrap()
-        .metadata()
-        .unwrap()
-        .modified()
-        .unwrap();
-
-    assert_eq!(modified_before, modified_after);
-
-    let script = get_hook_script(&root, "pre-push").unwrap();
-    assert_eq!(content + "\n", script);
 }
 
-#[test]
-fn another_hook_more_than_3_lines_already_exists() {
-    let root = cargo_project_for("another-hook-script-more-than-3-lines");
-    let prepush_path = hook_path(&root, "pre-push");
-    let content = "#!/bin/sh\n\n\necho 'hook put by someone else'".to_string();
-    let modified_before = {
-        let mut f = File::create(&prepush_path).unwrap();
-        writeln!(f, "{}", content);
-        f.metadata().unwrap().modified().unwrap()
-    };
-
-    // Ensure modified time differs from previous if file were updated
-    thread::sleep(time::Duration::from_secs(1));
-
-    run_cargo(&root, &["test"]);
-
-    let modified_after = File::open(&prepush_path)
-        .unwrap()
-        .metadata()
-        .unwrap()
-        .modified()
-        .unwrap();
-
-    assert_eq!(modified_before, modified_after);
-
-    let script = get_hook_script(&root, "pre-push").unwrap();
-    assert_eq!(content + "\n", script);
-}
+another_hook_test!(
+    another_hook_less_than_3_lines,
+    "#!/bin/sh\necho 'hook put by someone else'"
+);
+another_hook_test!(
+    another_hook_more_than_3_lines,
+    "#!/bin/sh\n\n\necho 'hook put by someone else'"
+);
