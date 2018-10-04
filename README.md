@@ -75,6 +75,14 @@ cargo-husky puts Git hook file only once for the same version. When it is update
 it overwrites the existing hook by detecting itself was updated.
 
 
+## TODO
+
+- Add `"user-hooks"` feature
+  - It copies `{repo-root}/.cargo-husky/hooks/*` into `.git/hooks`
+  - To check version, it automatically inserts `set by cargo-husky` comment line at line 3.
+  - All other features are ignored
+  - User hooks are supposed to be written in ShellScript (comment starts with `#` and ends at end of the line)
+
 ## License
 
 [MIT](./LICENSE.txt)
