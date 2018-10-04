@@ -23,7 +23,7 @@ lazy_static! {
 #[no_mangle]
 extern "C" fn cleanup_tmpdir() {
     if TMPDIR_ROOT.exists() {
-        fs::create_dir_all(TMPDIR_ROOT.as_path()).unwrap();
+        fs::remove_dir_all(TMPDIR_ROOT.as_path()).unwrap();
     }
 }
 
