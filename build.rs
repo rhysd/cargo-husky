@@ -134,12 +134,12 @@ set -e
 }
 
 #[cfg(target_os = "win32")]
-fn create_script(path: &Path) -> io::Result<File> {
+fn create_executable_file(path: &Path) -> io::Result<File> {
     fs::create(path)
 }
 
 #[cfg(not(target_os = "win32"))]
-fn create_script(path: &Path) -> io::Result<File> {
+fn create_executable_file(path: &Path) -> io::Result<File> {
     fs::OpenOptions::new()
         .write(true)
         .create(true)
@@ -148,7 +148,7 @@ fn create_script(path: &Path) -> io::Result<File> {
         .open(path)
 }
 
-fn install(hook: &str) -> Result<()> {
+fn install_hook(hook: &str) -> Result<()> {
     let hook_path = {
         let mut p = resolve_gitdir()?;
         p.push("hooks");
@@ -156,7 +156,7 @@ fn install(hook: &str) -> Result<()> {
         p
     };
     if !hook_already_exists(&hook_path) {
-        let mut f = create_script(&hook_path)?;
+        let mut f = create_executable_file(&hook_path)?;
         write_script(&mut f)?;
     }
     Ok(())
@@ -195,7 +195,7 @@ fn install_user_hook(src: &Path, dst: &Path) -> Result<()> {
 
     let dst_file_path = dst.join(src.file_name().unwrap());
 
-    let mut f = io::BufWriter::new(create_script(&dst_file_path)?);
+    let mut f = io::BufWriter::new(create_executable_file(&dst_file_path)?);
     for line in lines {
         writeln!(f, "{}", line)?;
     }
@@ -243,13 +243,13 @@ fn main() -> Result<()> {
         return install_user_hooks();
     }
     if cfg!(feature = "prepush-hook") {
-        install("pre-push")?;
+        install_hook("pre-push")?;
     }
     if cfg!(feature = "precommit-hook") {
-        install("pre-commit")?;
+        install_hook("pre-commit")?;
     }
     if cfg!(feature = "postmerge-hook") {
-        install("post-merge")?;
+        install_hook("post-merge")?;
     }
     Ok(())
 }
