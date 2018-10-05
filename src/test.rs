@@ -51,7 +51,7 @@ fn open_cargo_toml(repo_dir: &Path) -> fs::File {
         .unwrap()
 }
 
-fn run_cargo<I, S, P>(project_root: P, args: I) -> Output
+fn run_cargo<'a, I, S, P>(project_root: P, args: I) -> Result<Output, String>
 where
     I: IntoIterator<Item = S>,
     S: AsRef<ffi::OsStr>,
@@ -67,12 +67,16 @@ where
         "cargo failed: {}",
         str::from_utf8(out.stderr.as_slice()).unwrap()
     );
-    out
+    if out.status.success() {
+        Ok(out)
+    } else {
+        Err(str::from_utf8(out.stderr.as_slice()).unwrap().to_string())
+    }
 }
 
 fn cargo_project_for(name: &str) -> PathBuf {
     let dir = tmpdir_for(name);
-    run_cargo(&dir, &["init", "--lib"]);
+    run_cargo(&dir, &["init", "--lib"]).unwrap();
 
     let mut cargo_toml = open_cargo_toml(&dir);
     writeln!(
@@ -128,7 +132,7 @@ fn decrease_patch(mut ver: SemVer) -> SemVer {
 #[test]
 fn default_behavior() {
     let root = cargo_project_for("default");
-    run_cargo(&root, &["test"]);
+    run_cargo(&root, &["test"]).unwrap();
     let script = get_hook_script(&root, "pre-push").unwrap();
 
     assert_eq!(script.lines().nth(0).unwrap(), "#!/bin/sh");
@@ -153,7 +157,7 @@ fn change_features() {
         cargo_toml,
         "default-features = false\nfeatures = [\"precommit-hook\", \"run-cargo-clippy\"]"
     );
-    run_cargo(&root, &["test"]);
+    run_cargo(&root, &["test"]).unwrap();
 
     assert_eq!(get_hook_script(&root, "pre-push"), None);
 
@@ -165,7 +169,7 @@ fn change_features() {
 #[test]
 fn hook_not_updated_twice() {
     let root = cargo_project_for("not-update-twice");
-    run_cargo(&root, &["test"]);
+    run_cargo(&root, &["test"]).unwrap();
 
     let prepush_path = hook_path(&root, "pre-push");
 
@@ -184,7 +188,7 @@ fn hook_not_updated_twice() {
     // Ensure modified time differs from previous
     thread::sleep(time::Duration::from_secs(1));
 
-    run_cargo(&root, &["test"]);
+    run_cargo(&root, &["test"]).unwrap();
     let second = File::open(&prepush_path)
         .unwrap()
         .metadata()
@@ -199,7 +203,7 @@ fn hook_not_updated_twice() {
 fn regenerate_hook_script_on_package_update() {
     let root = cargo_project_for("package-update");
 
-    run_cargo(&root, &["test"]);
+    run_cargo(&root, &["test"]).unwrap();
 
     let prepush_path = hook_path(&root, "pre-push");
     let script = get_hook_script(&root, "pre-push").unwrap();
@@ -229,7 +233,7 @@ fn regenerate_hook_script_on_package_update() {
     // Ensure modified time differs from previous
     thread::sleep(time::Duration::from_secs(1));
 
-    run_cargo(&root, &["test"]);
+    run_cargo(&root, &["test"]).unwrap();
 
     let modified_after = File::open(&prepush_path)
         .unwrap()
@@ -267,7 +271,7 @@ macro_rules! another_hook_test {
             // Ensure modified time differs from previous if file were updated
             thread::sleep(time::Duration::from_secs(1));
 
-            run_cargo(&root, &["test"]);
+            run_cargo(&root, &["test"]).unwrap();
 
             let modified_after = File::open(&prepush_path)
                 .unwrap()
