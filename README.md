@@ -63,13 +63,15 @@ All features are follows:
 
 ## How It Works
 
-cargo-husky sets Git hook automatically on running tests by using [build scripts][].
+cargo-husky sets Git hook automatically on running tests by [cargo's build script feature][build scripts].
 
 Build scripts are intended to be used for building third-party non-Rust code such as C libraries.
 They are automatically run on compiling crates.
 
 If `cargo-husky` crate is added to `dev-dependencies` section, it is compiled at running tests.
 At the timing, [build script](./build.rs) is run and sets Git hook automatically.
+The build script find the `.git` directory to put hooks based on `$OUT_DIR` environment variable
+which is automatically set by `cargo`.
 
 cargo-husky puts Git hook file only once for the same version. When it is updated to a new version,
 it overwrites the existing hook by detecting itself was updated.
