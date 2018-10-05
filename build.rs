@@ -1,11 +1,7 @@
 use fs::File;
 use io::{BufRead, Read, Write};
-use os::unix::fs::OpenOptionsExt;
 use path::{Path, PathBuf};
 use std::{env, fmt, fs, io, os, path};
-
-#[cfg(not(target_os = "win32"))]
-use os::unix::fs::PermissionsExt;
 
 enum Error {
     GitDirNotFound,
@@ -143,6 +139,8 @@ fn create_executable_file(path: &Path) -> io::Result<File> {
 
 #[cfg(not(target_os = "win32"))]
 fn create_executable_file(path: &Path) -> io::Result<File> {
+    use os::unix::fs::OpenOptionsExt;
+
     fs::OpenOptions::new()
         .write(true)
         .create(true)
@@ -216,6 +214,8 @@ fn is_executable_file(entry: &fs::DirEntry) -> bool {
 
 #[cfg(not(target_os = "win32"))]
 fn is_executable_file(entry: &fs::DirEntry) -> bool {
+    use os::unix::fs::PermissionsExt;
+
     let ft = match entry.file_type() {
         Ok(ft) => ft,
         Err(..) => return false,

@@ -150,6 +150,24 @@ fn default_behavior() {
 }
 
 #[test]
+#[cfg(not(target_os = "win32"))]
+fn hook_file_is_executable() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let root = cargo_project_for("unit-permission");
+    run_cargo(&root, &["test"]).unwrap();
+
+    let prepush_path = hook_path(&root, "pre-push");
+    let mode = File::open(&prepush_path)
+        .unwrap()
+        .metadata()
+        .unwrap()
+        .permissions()
+        .mode();
+    assert_eq!(mode & 0o555, 0o555);
+}
+
+#[test]
 fn change_features() {
     let root = cargo_project_for("features");
     let mut cargo_toml = open_cargo_toml(&root);
