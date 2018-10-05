@@ -17,6 +17,11 @@ lazy_static! {
 
         tmp
     };
+    static ref TESTDIR: PathBuf = fs::canonicalize(file!())
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("testdata");
 }
 
 #[allow(private_no_mangle_fns)]
@@ -314,3 +319,66 @@ another_hook_test!(
     another_hook_more_than_3_lines,
     "#!/bin/sh\n\n\necho 'hook put by someone else'"
 );
+
+fn copy_dir_recursive(from: &Path, to: &Path) {
+    if !to.exists() {
+        fs::create_dir_all(to).unwrap();
+    }
+    for entry in fs::read_dir(from).unwrap() {
+        let entry = entry.unwrap();
+        let child_from = entry.path();
+        let child_to = to.join(child_from.strip_prefix(from).unwrap());
+        if entry.file_type().unwrap().is_dir() {
+            copy_dir_recursive(&child_from, &child_to);
+        } else {
+            fs::copy(child_from, child_to).unwrap();
+        }
+    }
+}
+
+#[test]
+fn user_hooks() {
+    let root = cargo_project_for("user-hooks");
+    let mut cargo_toml = open_cargo_toml(&root);
+    writeln!(
+        cargo_toml,
+        "default-features = false\nfeatures = [\"user-hooks\"]" // pre-push will be ignored
+    );
+
+    let user_hooks = TESTDIR.join("user-hooks");
+    copy_dir_recursive(&user_hooks.join(".cargo-husky"), &root.join(".cargo-husky"));
+
+    run_cargo(&root, &["test"]).unwrap();
+
+    assert!(!hook_path(&root, "pre-push").exists()); // Default features are ignored
+    assert!(hook_path(&root, "pre-commit").is_file());
+    assert!(hook_path(&root, "post-merge").is_file());
+
+    let check_line = format!(
+        "# This hook was set by cargo-husky v{}: {}",
+        env!("CARGO_PKG_VERSION"),
+        env!("CARGO_PKG_HOMEPAGE")
+    );
+
+    let s = get_hook_script(&root, "pre-commit").unwrap();
+    assert_eq!(s.lines().nth(0), Some("#! /bin/sh"));
+    assert_eq!(s.lines().nth(2), Some(check_line.as_str()));
+    assert_eq!(
+        s.lines().nth(4),
+        Some("# This is a user script for pre-commit hook with shebang")
+    );
+
+    let s = get_hook_script(&root, "post-merge").unwrap();
+    assert_eq!(s.lines().nth(0), Some("#"));
+    assert_eq!(s.lines().nth(2), Some(check_line.as_str()));
+    assert_eq!(
+        s.lines().nth(3),
+        Some("# Script without shebang (I'm not sure this is useful)")
+    );
+}
+
+// TODO: Test .cargo-husky directory is not found
+// TODO: Test .cargo-husky directory is empty
+// TODO: Test .cargo-husky/hooks directory is empty
+// TODO: Test only executable files are copied (on unix)
+// TODO: Test copied files have executable permission (on unix)

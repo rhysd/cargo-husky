@@ -1,0 +1,4 @@
+#! /bin/sh
+
+# This is a user script for pre-commit hook with shebang
+../../do-some-test.sh
