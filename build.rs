@@ -4,6 +4,9 @@ use os::unix::fs::OpenOptionsExt;
 use path::{Path, PathBuf};
 use std::{env, fmt, fs, io, os, path};
 
+#[cfg(not(target_os = "win32"))]
+use os::unix::fs::PermissionsExt;
+
 enum Error {
     GitDirNotFound,
     Io(io::Error),
@@ -203,6 +206,31 @@ fn install_user_hook(src: &Path, dst: &Path) -> Result<()> {
     Ok(())
 }
 
+#[cfg(target_os = "win32")]
+fn is_executable_file(entry: &fs::DirEntry) -> bool {
+    match entry.file_type() {
+        Ok(ft) => ft.is_file(),
+        Err(..) => false,
+    }
+}
+
+#[cfg(not(target_os = "win32"))]
+fn is_executable_file(entry: &fs::DirEntry) -> bool {
+    let ft = match entry.file_type() {
+        Ok(ft) => ft,
+        Err(..) => return false,
+    };
+    if !ft.is_file() {
+        return false;
+    }
+    let md = match entry.metadata() {
+        Ok(md) => md,
+        Err(..) => return false,
+    };
+    let mode = md.permissions().mode();
+    mode & 0o555 == 0o555 // Check file is read and executable mode
+}
+
 fn install_user_hooks() -> Result<()> {
     let git_dir = resolve_gitdir()?;
     let user_hooks_dir = {
@@ -218,13 +246,8 @@ fn install_user_hooks() -> Result<()> {
     }
 
     let hook_paths = fs::read_dir(&user_hooks_dir)?
-        .filter_map(|e| {
-            e.ok()
-                .filter(|e| match e.file_type() {
-                    Ok(ft) => ft.is_file(),
-                    Err(..) => false,
-                }).map(|e| e.path())
-        }).collect::<Vec<_>>();
+        .filter_map(|e| e.ok().filter(is_executable_file).map(|e| e.path()))
+        .collect::<Vec<_>>();
 
     if hook_paths.len() == 0 {
         return Err(Error::InvalidUserHooksDir(user_hooks_dir));
