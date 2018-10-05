@@ -1,6 +1,5 @@
 use fs::File;
-use io::BufRead;
-use io::Read;
+use io::{BufRead, Read, Write};
 use os::unix::fs::OpenOptionsExt;
 use path::{Path, PathBuf};
 use std::{env, fmt, fs, io, os, path};
@@ -9,6 +8,8 @@ enum Error {
     GitDirNotFound,
     Io(io::Error),
     OutDir(env::VarError),
+    InvalidUserHooksDir(PathBuf),
+    EmptyUserHook(PathBuf),
 }
 
 type Result<T> = std::result::Result<T, Error>;
@@ -35,6 +36,10 @@ impl fmt::Debug for Error {
             Error::Io(inner) => format!("IO error: {}", inner),
             Error::OutDir(env::VarError::NotPresent) => unreachable!(),
             Error::OutDir(env::VarError::NotUnicode(msg)) => msg.to_string_lossy().to_string(),
+            Error::InvalidUserHooksDir(path) => {
+                format!("User hooks directory is not found or empty: {:?}", path)
+            }
+            Error::EmptyUserHook(path) => format!("User hook script is empty: {:?}", path),
         };
         write!(f, "{}", msg)
     }
@@ -157,7 +162,86 @@ fn install(hook: &str) -> Result<()> {
     Ok(())
 }
 
+fn install_user_hook(src: &Path, dst: &Path) -> Result<()> {
+    if hook_already_exists(src) {
+        return Ok(());
+    }
+
+    let mut lines = {
+        let mut vec = vec![];
+        for line in io::BufReader::new(File::open(src)?).lines() {
+            vec.push(line?);
+        }
+        vec
+    };
+
+    if lines.len() == 0 {
+        return Err(Error::EmptyUserHook(src.to_owned()));
+    }
+
+    // Insert cargo-husky package version information as comment
+    if !lines[0].starts_with("#!") {
+        lines.insert(0, "#".to_string());
+    }
+    lines.insert(1, "#".to_string());
+    lines.insert(
+        2,
+        format!(
+            "# This hook was set by cargo-husky v{}: {}",
+            env!("CARGO_PKG_VERSION"),
+            env!("CARGO_PKG_HOMEPAGE")
+        ),
+    );
+
+    let dst_file_path = dst.join(src.file_name().unwrap());
+
+    let mut f = io::BufWriter::new(create_script(&dst_file_path)?);
+    for line in lines {
+        writeln!(f, "{}", line)?;
+    }
+
+    Ok(())
+}
+
+fn install_user_hooks() -> Result<()> {
+    let git_dir = resolve_gitdir()?;
+    let user_hooks_dir = {
+        let mut p = git_dir.clone();
+        p.pop();
+        p.push(".cargo-husky");
+        p.push("hooks");
+        p
+    };
+
+    if !user_hooks_dir.is_dir() {
+        return Err(Error::InvalidUserHooksDir(user_hooks_dir));
+    }
+
+    let hook_paths = fs::read_dir(&user_hooks_dir)?
+        .filter_map(|e| {
+            e.ok()
+                .filter(|e| match e.file_type() {
+                    Ok(ft) => ft.is_file(),
+                    Err(..) => false,
+                }).map(|e| e.path())
+        }).collect::<Vec<_>>();
+
+    if hook_paths.len() == 0 {
+        return Err(Error::InvalidUserHooksDir(user_hooks_dir));
+    }
+
+    let hooks_dir = git_dir.join("hooks");
+    for path in hook_paths {
+        install_user_hook(&path, &hooks_dir)?;
+    }
+
+    Ok(())
+}
+
 fn main() -> Result<()> {
+    if cfg!(feature = "user-hooks") {
+        return install_user_hooks();
+    }
     if cfg!(feature = "prepush-hook") {
         install("pre-push")?;
     }

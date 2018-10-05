@@ -19,6 +19,7 @@ precommit-hook = []
 postmerge-hook = []
 run-cargo-test = []
 run-cargo-clippy = []
+user-hooks = []
 
 [dependencies]
 
