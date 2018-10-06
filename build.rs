@@ -232,7 +232,6 @@ fn is_executable_file(entry: &fs::DirEntry) -> bool {
 }
 
 fn install_user_hooks() -> Result<()> {
-    println!("user hooks!");
     let git_dir = resolve_gitdir()?;
     let user_hooks_dir = {
         let mut p = git_dir.clone();

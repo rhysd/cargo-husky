@@ -67,11 +67,6 @@ where
         .current_dir(&project_root)
         .output()
         .unwrap();
-    assert!(
-        out.status.success(),
-        "cargo failed: {}",
-        str::from_utf8(out.stderr.as_slice()).unwrap()
-    );
     if out.status.success() {
         Ok(out)
     } else {
@@ -336,14 +331,18 @@ fn copy_dir_recursive(from: &Path, to: &Path) {
     }
 }
 
-#[test]
-fn user_hooks() {
-    let root = cargo_project_for("user-hooks");
+fn setup_user_hooks_feature(root: &Path) {
     let mut cargo_toml = open_cargo_toml(&root);
     writeln!(
         cargo_toml,
         "default-features = false\nfeatures = [\"user-hooks\"]" // pre-push will be ignored
     );
+}
+
+#[test]
+fn user_hooks() {
+    let root = cargo_project_for("user-hooks");
+    setup_user_hooks_feature(&root);
 
     let user_hooks = TESTDIR.join("user-hooks");
     copy_dir_recursive(&user_hooks.join(".cargo-husky"), &root.join(".cargo-husky"));
@@ -377,8 +376,90 @@ fn user_hooks() {
     );
 }
 
-// TODO: Test .cargo-husky directory is not found
-// TODO: Test .cargo-husky directory is empty
-// TODO: Test .cargo-husky/hooks directory is empty
-// TODO: Test only executable files are copied (on unix)
-// TODO: Test copied files have executable permission (on unix)
+fn assert_user_hooks_error(root: &Path) {
+    match run_cargo(&root, &["test"]) {
+        Ok(out) => assert!(
+            false,
+            "`cargo test` has unexpectedly successfully done: {:?}",
+            out
+        ),
+        Err(err) => {
+            assert!(format!("{}", err).contains("User hooks directory is not found or empty"))
+        }
+    }
+}
+
+#[test]
+fn user_hooks_dir_not_found() {
+    let root = cargo_project_for("user-hooks-dir-not-found");
+    setup_user_hooks_feature(&root);
+    assert_user_hooks_error(&root);
+}
+
+#[test]
+fn user_hooks_dir_is_empty() {
+    for (idx, dir_path) in [
+        PathBuf::from(".cargo-husky"),
+        Path::new(".cargo-husky").join("hooks"),
+    ]
+        .iter()
+        .enumerate()
+    {
+        let root = cargo_project_for(&format!("user-hooks-dir-empty-{}", idx));
+        setup_user_hooks_feature(&root);
+
+        fs::create_dir_all(&dir_path).unwrap();
+
+        assert_user_hooks_error(&root);
+    }
+}
+
+#[test]
+#[cfg(not(target_os = "win32"))]
+fn user_hooks_dir_only_contains_non_executable_file() {
+    let root = cargo_project_for("user-hooks-dir-not-found");
+    setup_user_hooks_feature(&root);
+
+    let mut p = root.join(".cargo-husky");
+    p.push("hooks");
+    fs::create_dir_all(&p).unwrap();
+    let f1 = p.join("non-executable-file1");
+    writeln!(File::create(&f1).unwrap(), "this\nis\nnormal\ntest\nfile").unwrap();
+    assert!(f1.exists());
+    let f2 = p.join("non-executable-file2");
+    writeln!(
+        File::create(&f2).unwrap(),
+        "this\nis\nalso\nnormal\ntest\nfile"
+    ).unwrap();
+    assert!(f2.exists());
+
+    assert_user_hooks_error(&root);
+}
+
+#[test]
+#[cfg(not(target_os = "win32"))]
+fn copied_user_hooks_are_executable() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let root = cargo_project_for("copied-user-hooks-are-executable");
+    setup_user_hooks_feature(&root);
+
+    let mut p = root.join(".cargo-husky");
+
+    let user_hooks = TESTDIR.join("user-hooks");
+    copy_dir_recursive(&user_hooks.join(".cargo-husky"), &p);
+
+    p.push("hooks");
+    p.push("non-executable-file.txt");
+    writeln!(File::create(p).unwrap(), "foo\nbar\npiyo").unwrap();
+
+    run_cargo(&root, &["test"]).unwrap();
+
+    for name in &["pre-commit", "post-merge"] {
+        let hook = File::open(hook_path(&root, name)).unwrap();
+        let mode = hook.metadata().unwrap().permissions().mode();
+        assert_eq!(mode & 0o555, 0o555);
+    }
+
+    assert!(!hook_path(&root, "non-executable-file.txt").exists());
+}
