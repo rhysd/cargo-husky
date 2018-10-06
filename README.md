@@ -61,6 +61,35 @@ All features are follows:
 | `run-cargo-clippy` | Run `cargo clippy` in hook scripts | Disabled |
 
 
+## User Hooks
+
+If generated hooks by `run-cargo-test` or `run-cargo-clippy` features are not sufficient for you,
+you can create your own hook scripts and tell cargo-husky to put them into `.git/hooks` directory.
+
+1. Create `.cargo-husky/hooks` directory at the same directory where `.git` directory is put.
+2. Create hook files such as `pre-push`, `pre-commit`, ... as you like.
+3. Give an executable permission to the files (on *nix OS).
+4. Write `features = ["user-hooks"]` to `[dev-dependencies.cargo-husky]` section of your `Cargo.toml`.
+5. Check whether it works by removing an existing `target` directory and run `cargo test`.
+
+e.g.
+
+```
+your-repository/
+├── .git
+└── .cargo-husky
+    └── hooks
+        ├── post-merge
+        └── pre-commit
+```
+
+cargo-husky inserts an information header to copied hook files in `.git/hooks/` in order to detect
+self version update.
+
+Note that, when `user-hooks` feature is enabled, other all features are disabled. You need to prepare
+all hooks in `.cargo-husky/hooks` directory.
+
+
 ## How It Works
 
 cargo-husky sets Git hook automatically on running tests by [cargo's build script feature][build scripts].
