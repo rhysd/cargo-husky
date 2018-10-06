@@ -68,7 +68,7 @@ you can create your own hook scripts and tell cargo-husky to put them into `.git
 
 1. Create `.cargo-husky/hooks` directory at the same directory where `.git` directory is put.
 2. Create hook files such as `pre-push`, `pre-commit`, ... as you like.
-3. Give an executable permission to the files (on *nix OS).
+3. Give an executable permission to the files (on \*nix OS).
 4. Write `features = ["user-hooks"]` to `[dev-dependencies.cargo-husky]` section of your `Cargo.toml`.
 5. Check whether it works by removing an existing `target` directory and run `cargo test`.
 
@@ -92,7 +92,8 @@ all hooks in `.cargo-husky/hooks` directory.
 
 ## How It Works
 
-cargo-husky sets Git hook automatically on running tests by [cargo's build script feature][build scripts].
+[husky][] utilizes npm's hook scripts, but cargo does not provide such hooks.
+Instead, cargo-husky sets Git hook automatically on running tests by [cargo's build script feature][build scripts].
 
 Build scripts are intended to be used for building third-party non-Rust code such as C libraries.
 They are automatically run on compiling crates.
@@ -105,14 +106,6 @@ which is automatically set by `cargo`.
 cargo-husky puts Git hook file only once for the same version. When it is updated to a new version,
 it overwrites the existing hook by detecting itself was updated.
 
-
-## TODO
-
-- Add `"user-hooks"` feature
-  - It copies `{repo-root}/.cargo-husky/hooks/*` into `.git/hooks`
-  - To check version, it automatically inserts `set by cargo-husky` comment line at line 3.
-  - All other features are ignored
-  - User hooks are supposed to be written in ShellScript (comment starts with `#` and ends at end of the line)
 
 ## License
 
