@@ -383,9 +383,11 @@ fn assert_user_hooks_error(root: &Path) {
             "`cargo test` has unexpectedly successfully done: {:?}",
             out
         ),
-        Err(err) => {
-            assert!(format!("{}", err).contains("User hooks directory is not found or empty"))
-        }
+        Err(err) => assert!(
+            format!("{}", err).contains("User hooks directory is not found or empty"),
+            "Unexpected output on `cargo test`: {}",
+            err
+        ),
     }
 }
 
@@ -417,7 +419,7 @@ fn user_hooks_dir_is_empty() {
 #[test]
 #[cfg(not(target_os = "win32"))]
 fn user_hooks_dir_only_contains_non_executable_file() {
-    let root = cargo_project_for("user-hooks-dir-not-found");
+    let root = cargo_project_for("user-hooks-dir-without-executables");
     setup_user_hooks_feature(&root);
 
     let mut p = root.join(".cargo-husky");
