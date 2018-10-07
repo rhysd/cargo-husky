@@ -1,0 +1,12 @@
+version: "{build}"
+build: off
+install:
+    - curl -sSf -o rustup-init.exe https://win.rustup.rs
+    - rustup-init.exe --default-host x86_64-pc-windows-gnu --default-toolchain stable -y
+    - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+    - rustc -Vv
+    - cargo -V
+test_script:
+    - cargo build -vv
+    - cargo test
+deploy: off
