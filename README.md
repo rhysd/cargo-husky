@@ -4,8 +4,6 @@ Husky for Cargo :dog:
 [![Build Status on Linux/macOS][travis-ci badge]][travis-ci]
 [![Build status on Windows][appveyor badge]][appveyor]
 
-**This package is under construction and not ready for production until version 1.0.0 is released.**
-
 [cargo-husky][] is a crate for Rust project managed by [cargo][]. In short, cargo-husky is a Rust
 version of [husky][].
 
@@ -20,7 +18,7 @@ Please add `cargo-husky` crate to `[dev-dependencies]` section of your project's
 
 ```toml
 [dev-dependencies]
-cargo-husky = "x.y"
+cargo-husky = "1"
 ```
 
 Then run tests in your project directory.
@@ -48,7 +46,7 @@ e.g.
 
 ```toml
 [dev-dependencies.cargo-husky]
-version = "x.y"
+version = "1"
 default-features = false # Disable features which are enabled by default
 features = ["precommit-hook", "run-cargo-test", "run-cargo-clippy"]
 ```
@@ -111,6 +109,7 @@ which is automatically set by `cargo`.
 cargo-husky puts Git hook file only once for the same version. When it is updated to a new version,
 it overwrites the existing hook by detecting itself was updated.
 
+cargo-husky is developed on macOS and tested on Linux/macOS/Windows with 'stable' channel Rust toolchain.
 
 ## License
 
