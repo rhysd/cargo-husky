@@ -1,5 +1,6 @@
 Husky for Cargo :dog:
 =====================
+[![Build Status][travis-ci badge]][travis-ci]
 
 **This package is under construction and not ready for production until version 1.0.0 is released.**
 
@@ -115,3 +116,5 @@ it overwrites the existing hook by detecting itself was updated.
 [cargo]: https://github.com/rust-lang/cargo
 [husky]: https://github.com/typicode/husky
 [build scripts]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
+[travis-ci badge]: https://travis-ci.org/rhysd/cargo-husky.svg?branch=master
+[travis-ci]: https://travis-ci.org/rhysd/cargo-husky

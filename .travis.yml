@@ -1,0 +1,9 @@
+os:
+    - linux
+    - osx
+language: rust
+rust: stable
+cache: cargo
+script:
+    - cargo build -vv
+    - cargo test
