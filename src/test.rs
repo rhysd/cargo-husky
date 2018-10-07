@@ -466,3 +466,15 @@ fn copied_user_hooks_are_executable() {
 
     assert!(!hook_path(&root, "non-executable-file.txt").exists());
 }
+
+#[test]
+fn empty_script_file_not_allowed() {
+    let root = cargo_project_for("empty-user-hook");
+    setup_user_hooks_feature(&root);
+
+    let user_hooks = TESTDIR.join("empty-user-hook");
+    copy_dir_recursive(&user_hooks.join(".cargo-husky"), &root.join(".cargo-husky"));
+
+    let err = run_cargo(&root, &["test"]).unwrap_err();
+    assert!(format!("{}", err).contains("User hook script is empty"));
+}
