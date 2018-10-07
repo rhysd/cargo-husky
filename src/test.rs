@@ -88,7 +88,8 @@ fn cargo_project_for(name: &str) -> PathBuf {
             .unwrap()
             .parent()
             .unwrap()
-            .to_string_lossy(),
+            .to_string_lossy()
+            .replace("\\", "\\\\"),
         env!("CARGO_PKG_VERSION"),
     ).unwrap();
     dir
