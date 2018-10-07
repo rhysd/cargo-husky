@@ -1,7 +1,9 @@
 use fs::File;
 use io::{BufRead, Read, Write};
 use path::{Path, PathBuf};
-use std::{env, fmt, fs, io, os, path};
+#[cfg(not(target_os = "windows"))]
+use std::os;
+use std::{env, fmt, fs, io, path};
 
 enum Error {
     GitDirNotFound,
@@ -132,12 +134,12 @@ set -e
     Ok(())
 }
 
-#[cfg(target_os = "win32")]
+#[cfg(target_os = "windows")]
 fn create_executable_file(path: &Path) -> io::Result<File> {
-    fs::create(path)
+    File::create(path)
 }
 
-#[cfg(not(target_os = "win32"))]
+#[cfg(not(target_os = "windows"))]
 fn create_executable_file(path: &Path) -> io::Result<File> {
     use os::unix::fs::OpenOptionsExt;
 
@@ -204,7 +206,7 @@ fn install_user_hook(src: &Path, dst: &Path) -> Result<()> {
     Ok(())
 }
 
-#[cfg(target_os = "win32")]
+#[cfg(target_os = "windows")]
 fn is_executable_file(entry: &fs::DirEntry) -> bool {
     match entry.file_type() {
         Ok(ft) => ft.is_file(),
@@ -212,7 +214,7 @@ fn is_executable_file(entry: &fs::DirEntry) -> bool {
     }
 }
 
-#[cfg(not(target_os = "win32"))]
+#[cfg(not(target_os = "windows"))]
 fn is_executable_file(entry: &fs::DirEntry) -> bool {
     use os::unix::fs::PermissionsExt;
 

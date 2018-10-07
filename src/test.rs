@@ -88,7 +88,8 @@ fn cargo_project_for(name: &str) -> PathBuf {
             .unwrap()
             .parent()
             .unwrap()
-            .to_string_lossy(),
+            .to_string_lossy()
+            .replace("\\", "\\\\"),
         env!("CARGO_PKG_VERSION"),
     ).unwrap();
     dir
@@ -150,7 +151,7 @@ fn default_behavior() {
 }
 
 #[test]
-#[cfg(not(target_os = "win32"))]
+#[cfg(not(target_os = "windows"))]
 fn hook_file_is_executable() {
     use std::os::unix::fs::PermissionsExt;
 
@@ -417,7 +418,7 @@ fn user_hooks_dir_is_empty() {
 }
 
 #[test]
-#[cfg(not(target_os = "win32"))]
+#[cfg(not(target_os = "windows"))]
 fn user_hooks_dir_only_contains_non_executable_file() {
     let root = cargo_project_for("user-hooks-dir-without-executables");
     setup_user_hooks_feature(&root);
@@ -439,7 +440,7 @@ fn user_hooks_dir_only_contains_non_executable_file() {
 }
 
 #[test]
-#[cfg(not(target_os = "win32"))]
+#[cfg(not(target_os = "windows"))]
 fn copied_user_hooks_are_executable() {
     use std::os::unix::fs::PermissionsExt;
 
