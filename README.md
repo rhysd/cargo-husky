@@ -1,5 +1,6 @@
 Husky for Cargo :dog:
 =====================
+[![Build status][appveyor badge]][appveyor]
 
 **This package is under construction and not ready for production until version 1.0.0 is released.**
 
@@ -115,3 +116,5 @@ it overwrites the existing hook by detecting itself was updated.
 [cargo]: https://github.com/rust-lang/cargo
 [husky]: https://github.com/typicode/husky
 [build scripts]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
+[appveyor badge]: https://ci.appveyor.com/api/projects/status/whby8hq44tf9bob4/branch/master?svg=true
+[appveyor]: https://ci.appveyor.com/project/rhysd/cargo-husky/branch/master
