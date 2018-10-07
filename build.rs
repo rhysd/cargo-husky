@@ -261,7 +261,19 @@ fn install_user_hooks() -> Result<()> {
     Ok(())
 }
 
+fn is_cross_compilation() -> bool {
+    // env!("HOST") and env!("TARGET") don't work since they are not set on running build script.
+    if let (Ok(host), Ok(target)) = (env::var("HOST"), env::var("TARGET")) {
+        host != target
+    } else {
+        false
+    }
+}
+
 fn main() -> Result<()> {
+    if is_cross_compilation() {
+        return Ok(());
+    }
     if cfg!(feature = "user-hooks") {
         return install_user_hooks();
     }
