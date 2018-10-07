@@ -1,7 +1,9 @@
 use fs::File;
 use io::{BufRead, Read, Write};
 use path::{Path, PathBuf};
-use std::{env, fmt, fs, io, os, path};
+#[cfg(not(target_os = "windows"))]
+use std::os;
+use std::{env, fmt, fs, io, path};
 
 enum Error {
     GitDirNotFound,
@@ -134,7 +136,7 @@ set -e
 
 #[cfg(target_os = "windows")]
 fn create_executable_file(path: &Path) -> io::Result<File> {
-    fs::create(path)
+    File::create(path)
 }
 
 #[cfg(not(target_os = "windows"))]
