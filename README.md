@@ -62,6 +62,7 @@ All features are follows:
 | `postmerge-hook`   | Generate `post-merge` hook script  | Disabled |
 | `run-cargo-test`   | Run `cargo test` in hook scripts   | Enabled  |
 | `run-cargo-clippy` | Run `cargo clippy` in hook scripts | Disabled |
+| `user-hooks`       | See below section                  | Disabled |
 
 
 ## User Hooks
@@ -84,6 +85,13 @@ your-repository/
     └── hooks
         ├── post-merge
         └── pre-commit
+```
+
+```toml
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false
+features = ["user-hooks"]
 ```
 
 cargo-husky inserts an information header to copied hook files in `.git/hooks/` in order to detect
