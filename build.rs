@@ -30,7 +30,7 @@ impl fmt::Debug for Error {
         let msg = match self {
             Error::GitDirNotFound => format!(
                 ".git directory was not found in '{}' or its parent directories",
-                env::var("OUT_DIR").unwrap_or("".to_string()),
+                env::var("OUT_DIR").unwrap_or_else(|_| "".to_string()),
             ),
             Error::Io(inner) => format!("IO error: {}", inner),
             Error::OutDir(env::VarError::NotPresent) => unreachable!(),
@@ -126,7 +126,7 @@ set -e
         env!("CARGO_PKG_HOMEPAGE"),
         env!("CARGO_MANIFEST_DIR"),
         path::MAIN_SEPARATOR,
-        env::var("OUT_DIR").unwrap_or("".to_string()),
+        env::var("OUT_DIR").unwrap_or_else(|_| "".to_string()),
         script
     )?;
     Ok(())
@@ -176,7 +176,7 @@ fn install_user_hook(src: &Path, dst: &Path) -> Result<()> {
         vec
     };
 
-    if lines.len() == 0 {
+    if lines.is_empty() {
         return Err(Error::EmptyUserHook(src.to_owned()));
     }
 
@@ -249,7 +249,7 @@ fn install_user_hooks() -> Result<()> {
         .filter_map(|e| e.ok().filter(is_executable_file).map(|e| e.path()))
         .collect::<Vec<_>>();
 
-    if hook_paths.len() == 0 {
+    if hook_paths.is_empty() {
         return Err(Error::InvalidUserHooksDir(user_hooks_dir));
     }
 
