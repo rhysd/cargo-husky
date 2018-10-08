@@ -53,6 +53,9 @@ Note: cargo-husky does nothing on `cargo test` when
 To uninstall cargo-husky, please remove `cargo-husky` from your `[dev-dependencies]` and remove
 hook scripts from `.git/hooks`.
 
+[Japanese blogpost](https://rhysd.hatenablog.com/entry/2018/10/08/205041)
+
+
 ## Customize behavior
 
 Behavior of cargo-husky can be customized by feature flags of `cargo-husky` package.
