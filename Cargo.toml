@@ -16,6 +16,11 @@ include = ["build.rs", "LICENSE.txt", "Cargo.toml", "src/**/*.rs"]
 travis-ci = { repository = "rhysd/cargo-husky" }
 appveyor = { repository = "rhysd/cargo-husky" }
 
+
+[[test]]
+name = "integration"
+path = "test/test.rs"
+
 [features]
 default = ["prepush-hook", "run-cargo-test"]
 prepush-hook = []

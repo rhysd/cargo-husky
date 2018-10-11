@@ -1,3 +1,8 @@
+#[macro_use]
+extern crate lazy_static;
+extern crate libc;
+extern crate semver;
+
 use semver::Version as SemVer;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
