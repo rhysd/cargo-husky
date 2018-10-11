@@ -15,7 +15,7 @@ include = ["build.rs", "LICENSE.txt", "Cargo.toml", "src/**/*.rs"]
 [badges]
 travis-ci = { repository = "rhysd/cargo-husky" }
 appveyor = { repository = "rhysd/cargo-husky" }
-
+maintenance = { status = "actively-developed" }
 
 [[test]]
 name = "integration"
