@@ -12,6 +12,10 @@ license-file = "LICENSE.txt"
 build = "build.rs"
 include = ["build.rs", "LICENSE.txt", "Cargo.toml", "src/**/*.rs"]
 
+[badges]
+travis-ci = { repository = "rhysd/cargo-husky" }
+appveyor = { repository = "rhysd/cargo-husky" }
+
 [features]
 default = ["prepush-hook", "run-cargo-test"]
 prepush-hook = []
