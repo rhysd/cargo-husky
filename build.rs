@@ -107,6 +107,9 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
         if cfg!(feature = "run-cargo-test") {
             s += "\necho '+cargo test'\ncargo test";
         }
+        if cfg!(feature = "run-cargo-check") {
+            s += "\necho '+cargo check'\ncargo check";
+        }
         if cfg!(feature = "run-cargo-clippy") {
             s += "\necho '+cargo clippy'\ncargo clippy";
         }

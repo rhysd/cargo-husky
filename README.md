@@ -81,6 +81,7 @@ All features are follows:
 | `precommit-hook`   | Generate `pre-commit` hook script  | Disabled |
 | `postmerge-hook`   | Generate `post-merge` hook script  | Disabled |
 | `run-cargo-test`   | Run `cargo test` in hook scripts   | Enabled  |
+| `run-cargo-check`  | Run `cargo check` in hook scripts  | Disabled |
 | `run-cargo-clippy` | Run `cargo clippy` in hook scripts | Disabled |
 | `user-hooks`       | See below section                  | Disabled |
 

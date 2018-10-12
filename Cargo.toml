@@ -27,6 +27,7 @@ prepush-hook = []
 precommit-hook = []
 postmerge-hook = []
 run-cargo-test = []
+run-cargo-check = []
 run-cargo-clippy = []
 user-hooks = []
 

@@ -179,7 +179,7 @@ fn change_features() {
     let mut cargo_toml = open_cargo_toml(&root);
     writeln!(
         cargo_toml,
-        "default-features = false\nfeatures = [\"precommit-hook\", \"run-cargo-clippy\"]"
+        "default-features = false\nfeatures = [\"precommit-hook\", \"run-cargo-clippy\", \"run-cargo-check\"]"
     );
     run_cargo(&root, &["test"]).unwrap();
 
@@ -188,6 +188,7 @@ fn change_features() {
     let script = get_hook_script(&root, "pre-commit").unwrap();
     assert!(script.lines().all(|l| l != "cargo test"));
     assert_eq!(script.lines().filter(|l| *l == "cargo clippy").count(), 1);
+    assert_eq!(script.lines().filter(|l| *l == "cargo check").count(), 1);
 }
 
 #[test]
