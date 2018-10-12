@@ -150,7 +150,7 @@ fn default_behavior() {
             .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str())
     );
     assert_eq!(script.lines().filter(|l| *l == "cargo test").count(), 1);
-    assert!(script.lines().all(|l| l != "cargo clippy"));
+    assert!(script.lines().all(|l| l != "cargo clippy -- -D warnings"));
 
     assert_eq!(get_hook_script(&root, "pre-commit"), None);
 }
@@ -187,7 +187,13 @@ fn change_features() {
 
     let script = get_hook_script(&root, "pre-commit").unwrap();
     assert!(script.lines().all(|l| l != "cargo test"));
-    assert_eq!(script.lines().filter(|l| *l == "cargo clippy").count(), 1);
+    assert_eq!(
+        script
+            .lines()
+            .filter(|l| *l == "cargo clippy -- -D warnings")
+            .count(),
+        1
+    );
     assert_eq!(script.lines().filter(|l| *l == "cargo check").count(), 1);
 }
 
