@@ -113,6 +113,9 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
         if cfg!(feature = "run-cargo-clippy") {
             s += "\necho '+cargo clippy -- -D warnings'\ncargo clippy -- -D warnings";
         }
+        if cfg!(feature = "run-cargo-fmt") {
+            s += "\necho '+cargo fmt -- --check'\ncargo fmt -- --check";
+        }
         s
     };
 
