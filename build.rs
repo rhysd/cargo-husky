@@ -102,19 +102,25 @@ fn hook_already_exists(hook: &Path) -> bool {
 }
 
 fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
+    macro_rules! cmd {
+        ($c:expr) => {
+            concat!("\necho '+", $c, "'\n", $c)
+        };
+    }
+
     let script = {
         let mut s = String::new();
         if cfg!(feature = "run-cargo-test") {
-            s += "\necho '+cargo test'\ncargo test";
+            s += cmd!("cargo test");
         }
         if cfg!(feature = "run-cargo-check") {
-            s += "\necho '+cargo check'\ncargo check";
+            s += cmd!("cargo check");
         }
         if cfg!(feature = "run-cargo-clippy") {
-            s += "\necho '+cargo clippy -- -D warnings'\ncargo clippy -- -D warnings";
+            s += cmd!("cargo clippy -- -D warnings");
         }
         if cfg!(feature = "run-cargo-fmt") {
-            s += "\necho '+cargo fmt -- --check'\ncargo fmt -- --check";
+            s += cmd!("cargo fmt -- --check");
         }
         s
     };
