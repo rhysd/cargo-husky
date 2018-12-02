@@ -142,13 +142,11 @@ fn default_behavior() {
     let script = get_hook_script(&root, "pre-push").unwrap();
 
     assert_eq!(script.lines().nth(0).unwrap(), "#!/bin/sh");
-    assert!(
-        script
-            .lines()
-            .nth(2)
-            .unwrap()
-            .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str())
-    );
+    assert!(script
+        .lines()
+        .nth(2)
+        .unwrap()
+        .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str()));
     assert_eq!(script.lines().filter(|l| *l == "cargo test").count(), 1);
     assert!(script.lines().all(|l| l != "cargo clippy -- -D warnings"));
 
@@ -284,13 +282,11 @@ fn regenerate_hook_script_on_package_update() {
 
     // Check the version is updated in hook script
     let script = get_hook_script(&root, "pre-push").unwrap();
-    assert!(
-        script
-            .lines()
-            .nth(2)
-            .unwrap()
-            .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str())
-    );
+    assert!(script
+        .lines()
+        .nth(2)
+        .unwrap()
+        .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str()));
 }
 
 macro_rules! another_hook_test {
@@ -424,8 +420,8 @@ fn user_hooks_dir_is_empty() {
         PathBuf::from(".cargo-husky"),
         Path::new(".cargo-husky").join("hooks"),
     ]
-        .iter()
-        .enumerate()
+    .iter()
+    .enumerate()
     {
         let root = cargo_project_for(&format!("user-hooks-dir-empty-{}", idx));
         setup_user_hooks_feature(&root);
@@ -452,7 +448,8 @@ fn user_hooks_dir_only_contains_non_executable_file() {
     writeln!(
         File::create(&f2).unwrap(),
         "this\nis\nalso\nnormal\ntest\nfile"
-    ).unwrap();
+    )
+    .unwrap();
     assert!(f2.exists());
 
     assert_user_hooks_error(&root);
