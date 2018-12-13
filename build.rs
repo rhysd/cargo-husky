@@ -275,7 +275,7 @@ fn install_user_hooks() -> Result<()> {
     Ok(())
 }
 
-fn main() -> Result<()> {
+fn install() -> Result<()> {
     if cfg!(feature = "user-hooks") {
         return install_user_hooks();
     }
@@ -289,4 +289,15 @@ fn main() -> Result<()> {
         install_hook("post-merge")?;
     }
     Ok(())
+}
+
+fn main() -> Result<()> {
+    match install() {
+        Err(e @ Error::GitDirNotFound) => {
+            // #2
+            eprintln!("Warning: {:?}", e);
+            Ok(())
+        }
+        otherwise => otherwise,
+    }
 }
