@@ -29,7 +29,6 @@ lazy_static! {
         .join("testdata");
 }
 
-#[allow(private_no_mangle_fns)]
 #[no_mangle]
 extern "C" fn cleanup_tmpdir() {
     if TMPDIR_ROOT.exists() {
@@ -142,13 +141,11 @@ fn default_behavior() {
     let script = get_hook_script(&root, "pre-push").unwrap();
 
     assert_eq!(script.lines().nth(0).unwrap(), "#!/bin/sh");
-    assert!(
-        script
-            .lines()
-            .nth(2)
-            .unwrap()
-            .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str())
-    );
+    assert!(script
+        .lines()
+        .nth(2)
+        .unwrap()
+        .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str()));
     assert_eq!(script.lines().filter(|l| *l == "cargo test").count(), 1);
     assert!(script.lines().all(|l| l != "cargo clippy -- -D warnings"));
 
@@ -180,7 +177,7 @@ fn change_features() {
     writeln!(
         cargo_toml,
         "default-features = false\nfeatures = [\"precommit-hook\", \"run-cargo-clippy\", \"run-cargo-check\", \"run-cargo-fmt\"]"
-    );
+    ).unwrap();
     run_cargo(&root, &["test"]).unwrap();
 
     assert_eq!(get_hook_script(&root, "pre-push"), None);
@@ -259,7 +256,7 @@ fn regenerate_hook_script_on_package_update() {
             .truncate(true)
             .open(&prepush_path)
             .unwrap();
-        write!(f, "{}", script);
+        write!(f, "{}", script).unwrap();
         f.metadata().unwrap().modified().unwrap()
     };
 
@@ -284,13 +281,11 @@ fn regenerate_hook_script_on_package_update() {
 
     // Check the version is updated in hook script
     let script = get_hook_script(&root, "pre-push").unwrap();
-    assert!(
-        script
-            .lines()
-            .nth(2)
-            .unwrap()
-            .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str())
-    );
+    assert!(script
+        .lines()
+        .nth(2)
+        .unwrap()
+        .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str()));
 }
 
 macro_rules! another_hook_test {
@@ -302,7 +297,7 @@ macro_rules! another_hook_test {
             let content = $content.to_string();
             let modified_before = {
                 let mut f = File::create(&prepush_path).unwrap();
-                writeln!(f, "{}", content);
+                writeln!(f, "{}", content).unwrap();
                 f.metadata().unwrap().modified().unwrap()
             };
 
@@ -356,7 +351,8 @@ fn setup_user_hooks_feature(root: &Path) {
     writeln!(
         cargo_toml,
         "default-features = false\nfeatures = [\"user-hooks\"]" // pre-push will be ignored
-    );
+    )
+    .unwrap();
 }
 
 #[test]
@@ -424,8 +420,8 @@ fn user_hooks_dir_is_empty() {
         PathBuf::from(".cargo-husky"),
         Path::new(".cargo-husky").join("hooks"),
     ]
-        .iter()
-        .enumerate()
+    .iter()
+    .enumerate()
     {
         let root = cargo_project_for(&format!("user-hooks-dir-empty-{}", idx));
         setup_user_hooks_feature(&root);
@@ -452,7 +448,8 @@ fn user_hooks_dir_only_contains_non_executable_file() {
     writeln!(
         File::create(&f2).unwrap(),
         "this\nis\nalso\nnormal\ntest\nfile"
-    ).unwrap();
+    )
+    .unwrap();
     assert!(f2.exists());
 
     assert_user_hooks_error(&root);
