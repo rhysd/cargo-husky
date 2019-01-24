@@ -146,8 +146,8 @@ fn default_behavior() {
         .nth(2)
         .unwrap()
         .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str()));
-    assert_eq!(script.lines().filter(|l| *l == "cargo test").count(), 1);
-    assert!(script.lines().all(|l| l != "cargo clippy -- -D warnings"));
+    assert_eq!(script.lines().filter(|l| *l == "cargo test --all").count(), 1);
+    assert!(script.lines().all(|l| !l.contains("cargo clippy")));
 
     assert_eq!(get_hook_script(&root, "pre-commit"), None);
 }
@@ -196,6 +196,43 @@ fn change_features() {
         script
             .lines()
             .filter(|l| *l == "cargo fmt -- --check")
+            .count(),
+        1
+    );
+}
+
+#[test]
+fn change_features_using_run_for_all() {
+    let root = cargo_project_for("features_using_run_for_all");
+    let mut cargo_toml = open_cargo_toml(&root);
+    writeln!(
+        cargo_toml,
+        "default-features = false\nfeatures = [\"precommit-hook\", \"run-for-all\", \"run-cargo-test\", \"run-cargo-check\", \"run-cargo-clippy\", \"run-cargo-fmt\"]"
+    ).unwrap();
+    run_cargo(&root, &["test"]).unwrap();
+
+    assert_eq!(get_hook_script(&root, "pre-push"), None);
+
+    let script = get_hook_script(&root, "pre-commit").unwrap();
+    assert_eq!(
+        script
+            .lines()
+            .filter(|l| *l == "cargo test --all")
+            .count(),
+        1
+    );
+    assert_eq!(
+        script
+            .lines()
+            .filter(|l| *l == "cargo clippy --all -- -D warnings")
+            .count(),
+        1
+    );
+    assert_eq!(script.lines().filter(|l| *l == "cargo check --all").count(), 1);
+    assert_eq!(
+        script
+            .lines()
+            .filter(|l| *l == "cargo fmt --all -- --check")
             .count(),
         1
     );
