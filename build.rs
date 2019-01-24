@@ -105,22 +105,26 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
     macro_rules! raw_cmd {
         ($c:expr) => {
             concat!("\necho '+", $c, "'\n", $c)
-        }
+        };
     }
+
+    #[cfg(feature = "run-for-all")]
     macro_rules! cmd {
         ($c:expr) => {
-            if cfg!(feature = "run-for-all") {
-                raw_cmd!(concat!($c, " --all"))
-            } else {
-                raw_cmd!($c)
-            }
+            raw_cmd!(concat!($c, " --all"))
         };
         ($c:expr, $subflags:expr) => {
-            if cfg!(feature = "run-for-all") {
-                raw_cmd!(concat!($c, " --all -- ", $subflags))
-            } else {
-                raw_cmd!(concat!($c, " -- ", $subflags))
-            }
+            raw_cmd!(concat!($c, " --all -- ", $subflags))
+        };
+    }
+
+    #[cfg(not(feature = "run-for-all"))]
+    macro_rules! cmd {
+        ($c:expr) => {
+            raw_cmd!($c)
+        };
+        ($c:expr, $subflags:expr) => {
+            raw_cmd!(concat!($c, " -- ", $subflags))
         };
     }
 
@@ -136,7 +140,7 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
             s += cmd!("cargo clippy", "-D warnings");
         }
         if cfg!(feature = "run-cargo-fmt") {
-            s += cmd!("cargo fmt",  "--check");
+            s += cmd!("cargo fmt", "--check");
         }
         s
     };
