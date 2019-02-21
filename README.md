@@ -114,7 +114,7 @@ your-repository/
 [dev-dependencies.cargo-husky]
 version = "1"
 default-features = false
-features = ["user-hooks"]
+features = ["precommit-hook", "postmerge-hook", "user-hooks"]
 ```
 
 cargo-husky inserts an information header to copied hook files in `.git/hooks/` in order to detect
