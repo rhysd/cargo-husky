@@ -124,6 +124,16 @@ Note that, when `user-hooks` feature is enabled, other all features are disabled
 all hooks in `.cargo-husky/hooks` directory.
 
 
+## Ignore Installing Hooks
+
+When you don't want to install hooks for some reason, please set `$CARGO_HUSKY_DONT_INSTALL_HOOKS`
+environment variable.
+
+```
+CARGO_HUSKY_DONT_INSTALL_HOOKS=true cargo test
+```
+
+
 ## How It Works
 
 [husky][] utilizes npm's hook scripts, but cargo does not provide such hooks.

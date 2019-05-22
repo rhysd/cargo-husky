@@ -18,7 +18,7 @@ no-dev-version = true
 [badges]
 travis-ci = { repository = "rhysd/cargo-husky" }
 appveyor = { repository = "rhysd/cargo-husky" }
-maintenance = { status = "actively-developed" }
+maintenance = { status = "passively-maintained" }
 
 [[test]]
 name = "integration"
