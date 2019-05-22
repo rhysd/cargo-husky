@@ -313,8 +313,8 @@ fn install() -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    if var_os("DONT_INSTALL_HUSKY_HOOKS").is_some() {
-        eprintln!("Warning: Found '$DONT_INSTALL_HUSKY_HOOKS' in env, not doing anything!");
+    if var_os("CARGO_HUSKY_DONT_INSTALL_HOOKS").is_some() {
+        eprintln!("Warning: Found '$CARGO_HUSKY_DONT_INSTALL_HOOKS' in env, not doing anything!");
         return Ok(());
     }
 
