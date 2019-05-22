@@ -62,7 +62,7 @@ fn resolve_gitdir() -> Result<PathBuf> {
             let mut buf = String::new();
             File::open(gitdir)?.read_to_string(&mut buf)?;
             let newlines: &[_] = &['\n', '\r'];
-            let gitdir = PathBuf::from(buf.trim_right_matches(newlines));
+            let gitdir = PathBuf::from(buf.trim_end_matches(newlines));
             if !gitdir.is_dir() {
                 return Err(Error::GitDirNotFound);
             }
