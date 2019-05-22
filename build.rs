@@ -4,6 +4,7 @@ use path::{Path, PathBuf};
 #[cfg(not(target_os = "windows"))]
 use std::os;
 use std::{env, fmt, fs, io, path};
+use std::env::var_os;
 
 enum Error {
     GitDirNotFound,
@@ -312,12 +313,17 @@ fn install() -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    match install() {
-        Err(e @ Error::GitDirNotFound) => {
-            // #2
-            eprintln!("Warning: {:?}", e);
-            Ok(())
+    if var_os("DONT_INSTALL_HUSKY_HOOKS").is_some() {
+        println!("Found 'DONT_INSTALL_HUSKY_HOOKS' in env, not doing anything!");
+        Ok(())
+    } else {
+        match install() {
+            Err(e @ Error::GitDirNotFound) => {
+                // #2
+                eprintln!("Warning: {:?}", e);
+                Ok(())
+            }
+            otherwise => otherwise,
         }
-        otherwise => otherwise,
     }
 }
