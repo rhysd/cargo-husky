@@ -437,7 +437,7 @@ fn assert_user_hooks_error(root: &Path) {
             out
         ),
         Err(err) => assert!(
-            format!("{}", err).contains("User hooks directory is not found or empty"),
+            format!("{}", err).contains("User hooks directory is not found or no executable file is found in"),
             "Unexpected output on `cargo test`: {}",
             err
         ),

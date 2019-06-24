@@ -39,8 +39,8 @@ impl fmt::Debug for Error {
             Error::OutDir(env::VarError::NotPresent) => unreachable!(),
             Error::OutDir(env::VarError::NotUnicode(msg)) => msg.to_string_lossy().to_string(),
             Error::InvalidUserHooksDir(path) => {
-                format!("User hooks directory is not found or empty: {:?}", path)
-            }
+                format!("User hooks directory is not found or no executable file is found in '{:?}'. Did you forget to make a hook script executable?", path)
+	        }
             Error::EmptyUserHook(path) => format!("User hook script is empty: {:?}", path),
         };
         write!(f, "{}", msg)
