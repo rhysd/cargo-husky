@@ -2,8 +2,6 @@ use fs::File;
 use io::{BufRead, Read, Write};
 use path::{Path, PathBuf};
 use std::env::var_os;
-#[cfg(not(target_os = "windows"))]
-use std::os;
 use std::{env, fmt, fs, io, path};
 
 enum Error {
@@ -174,7 +172,7 @@ fn create_executable_file(path: &Path) -> io::Result<File> {
 
 #[cfg(not(target_os = "windows"))]
 fn create_executable_file(path: &Path) -> io::Result<File> {
-    use os::unix::fs::OpenOptionsExt;
+    use std::os::unix::fs::OpenOptionsExt;
 
     fs::OpenOptions::new()
         .write(true)
@@ -249,7 +247,7 @@ fn is_executable_file(entry: &fs::DirEntry) -> bool {
 
 #[cfg(not(target_os = "windows"))]
 fn is_executable_file(entry: &fs::DirEntry) -> bool {
-    use os::unix::fs::PermissionsExt;
+    use std::os::unix::fs::PermissionsExt;
 
     let ft = match entry.file_type() {
         Ok(ft) => ft,
