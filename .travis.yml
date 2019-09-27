@@ -4,6 +4,12 @@ os:
 language: rust
 rust: stable
 cache: cargo
+before_script:
+    - rustup component add rustfmt
+    - rustc -V
+    - cargo -V
+    - rustfmt -V
 script:
     - cargo build -vv
     - cargo test
+    - cargo fmt -- --check
