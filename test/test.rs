@@ -147,7 +147,10 @@ fn default_behavior() {
         .unwrap()
         .contains(format!("set by cargo-husky v{}", env!("CARGO_PKG_VERSION")).as_str()));
     assert_eq!(
-        script.lines().filter(|l| *l == "cargo test --all").count(),
+        script
+            .lines()
+            .filter(|l| *l == "run cargo test --all")
+            .count(),
         1
     );
     assert!(script.lines().all(|l| !l.contains("cargo clippy")));
@@ -186,19 +189,22 @@ fn change_features() {
     assert_eq!(get_hook_script(&root, "pre-push"), None);
 
     let script = get_hook_script(&root, "pre-commit").unwrap();
-    assert!(script.lines().all(|l| l != "cargo test"));
+    assert!(script.lines().all(|l| l != "run cargo test"));
     assert_eq!(
         script
             .lines()
-            .filter(|l| *l == "cargo clippy -- -D warnings")
+            .filter(|l| *l == "run cargo clippy -- -D warnings")
             .count(),
         1
     );
-    assert_eq!(script.lines().filter(|l| *l == "cargo check").count(), 1);
+    assert_eq!(
+        script.lines().filter(|l| *l == "run cargo check").count(),
+        1
+    );
     assert_eq!(
         script
             .lines()
-            .filter(|l| *l == "cargo fmt -- --check")
+            .filter(|l| *l == "run cargo fmt -- --check")
             .count(),
         1
     );
@@ -218,24 +224,30 @@ fn change_features_using_run_for_all() {
 
     let script = get_hook_script(&root, "pre-commit").unwrap();
     assert_eq!(
-        script.lines().filter(|l| *l == "cargo test --all").count(),
-        1
-    );
-    assert_eq!(
         script
             .lines()
-            .filter(|l| *l == "cargo clippy --all -- -D warnings")
+            .filter(|l| *l == "run cargo test --all")
             .count(),
         1
     );
     assert_eq!(
-        script.lines().filter(|l| *l == "cargo check --all").count(),
+        script
+            .lines()
+            .filter(|l| *l == "run cargo clippy --all -- -D warnings")
+            .count(),
         1
     );
     assert_eq!(
         script
             .lines()
-            .filter(|l| *l == "cargo fmt --all -- --check")
+            .filter(|l| *l == "run cargo check --all")
+            .count(),
+        1
+    );
+    assert_eq!(
+        script
+            .lines()
+            .filter(|l| *l == "run cargo fmt --all -- --check")
             .count(),
         1
     );
