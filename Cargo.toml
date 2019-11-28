@@ -10,7 +10,7 @@ keywords = ["git", "hook", "cargo"]
 categories = ["development-tools"]
 license-file = "LICENSE.txt"
 build = "build.rs"
-include = ["build.rs", "LICENSE.txt", "README.md, cargo-husky-1.4.0.crate"Cargo.toml", "src/**/*.rs"]
+include = ["build.rs", "LICENSE.txt", "README.md", "Cargo.toml", "src/**/*.rs"]
 
 [package.metadata.release]
 no-dev-version = true
