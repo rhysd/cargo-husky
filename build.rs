@@ -1,3 +1,5 @@
+extern crate colored;
+use colored::*;
 use fs::File;
 use io::{BufRead, Read, Write};
 use path::{Path, PathBuf};
@@ -103,7 +105,7 @@ fn hook_already_exists(hook: &Path) -> bool {
 fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
     macro_rules! raw_cmd {
         ($c:expr) => {
-            concat!("\necho '+", $c, "'\n", $c)
+            concat!("\nrun ", $c)
         };
     }
 
@@ -153,13 +155,42 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
 # Output at {}
 #
 
-set -e
+animation() {{
+    sp='/-\|'
+    printf ' '
+    sleep 0.1
+    while true; do
+        printf '\b%.1s' "$sp"
+        sp=${{sp#?}}${{sp%???}}
+        sleep 0.1
+    done
+}}
+
+run() {{
+    printf "%s" "{} '$*' "
+    animation &
+    animation_pid="$!"
+    output="$("$@" 2>&1)"
+    ret=$?
+    kill "$animation_pid"
+    wait "$animation_pid" 2>/dev/null
+    if [ $ret -eq 0 ]; then
+        printf "\b- {}\n"
+    else
+        printf "\b- {}\n"
+        printf "%s" "$output"
+        exit $ret
+    fi
+}}
 {}"#,
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_HOMEPAGE"),
         env!("CARGO_MANIFEST_DIR"),
         path::MAIN_SEPARATOR,
         env::var("OUT_DIR").unwrap_or_else(|_| "".to_string()),
+        "Running".bold(),
+        "Ok".bold().green(),
+        "Failed".bold().red(),
         script
     )?;
     Ok(())
