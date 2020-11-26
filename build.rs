@@ -186,6 +186,12 @@ fn install_hook(hook: &str) -> Result<()> {
     let hook_path = {
         let mut p = resolve_gitdir()?;
         p.push("hooks");
+
+        // Check if .git/hooks exists and create it if not
+        if !p.exists() {
+            fs::create_dir(p.as_path())?;
+        }
+
         p.push(hook);
         p
     };
