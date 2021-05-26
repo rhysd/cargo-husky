@@ -75,17 +75,18 @@ This configuration generates `.git/hooks/pre-commit` script which runs `cargo te
 
 All features are follows:
 
-| Feature            | Description                                                         | Default  |
-|--------------------|---------------------------------------------------------------------|----------|
-| `run-for-all`      | Add `--all` option to command to run it for all crates in workspace | Enabled  |
-| `prepush-hook`     | Generate `pre-push` hook script                                     | Enabled  |
-| `precommit-hook`   | Generate `pre-commit` hook script                                   | Disabled |
-| `postmerge-hook`   | Generate `post-merge` hook script                                   | Disabled |
-| `run-cargo-test`   | Run `cargo test` in hook scripts                                    | Enabled  |
-| `run-cargo-check`  | Run `cargo check` in hook scripts                                   | Disabled |
-| `run-cargo-clippy` | Run `cargo clippy -- -D warnings` in hook scripts                   | Disabled |
-| `run-cargo-fmt`    | Run `cargo fmt -- --check` in hook scripts                          | Disabled |
-| `user-hooks`       | See below section                                                   | Disabled |
+| Feature               | Description                                                         | Default  |
+|-----------------------|---------------------------------------------------------------------|----------|
+| `run-for-all`         | Add `--all` option to command to run it for all crates in workspace | Enabled  |
+| `prepush-hook`        | Generate `pre-push` hook script                                     | Enabled  |
+| `precommit-hook`      | Generate `pre-commit` hook script                                   | Disabled |
+| `postmerge-hook`      | Generate `post-merge` hook script                                   | Disabled |
+| `run-cargo-test`      | Run `cargo test` in hook scripts                                    | Enabled  |
+| `run-cargo-check`     | Run `cargo check` in hook scripts                                   | Disabled |
+| `run-cargo-clippy`    | Run `cargo clippy -- -D warnings` in hook scripts                   | Disabled |
+| `run-cargo-fmt`       | Run `cargo fmt -- --check` in hook scripts                          | Disabled |
+| `run-cargo-fmt-write` | Run `cargo fmt` in hook scripts – formatting code if needed         | Disabled |
+| `user-hooks`          | See below section                                                   | Disabled |
 
 
 ## User Hooks
