@@ -8,7 +8,7 @@ homepage = "https://github.com/rhysd/cargo-husky#readme"
 readme = "README.md"
 keywords = ["git", "hook", "cargo"]
 categories = ["development-tools"]
-license-file = "LICENSE.txt"
+license = "MIT"
 build = "build.rs"
 include = ["build.rs", "LICENSE.txt", "Cargo.toml", "src/**/*.rs"]
 
