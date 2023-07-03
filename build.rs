@@ -129,8 +129,8 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
 
     let script = {
         let mut s = String::new();
-        if cfg!(feature = "run-cargo-test") {
-            s += cmd!("cargo test");
+        if cfg!(feature = "run-cargo-fmt") {
+            s += cmd!("cargo fmt", "--check");
         }
         if cfg!(feature = "run-cargo-check") {
             s += cmd!("cargo check");
@@ -138,8 +138,8 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
         if cfg!(feature = "run-cargo-clippy") {
             s += cmd!("cargo clippy", "-D warnings");
         }
-        if cfg!(feature = "run-cargo-fmt") {
-            s += cmd!("cargo fmt", "--check");
+        if cfg!(feature = "run-cargo-test") {
+            s += cmd!("cargo test");
         }
         s
     };
