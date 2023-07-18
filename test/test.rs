@@ -535,3 +535,26 @@ fn empty_script_file_not_allowed() {
     let err = run_cargo(&root, &["test"]).unwrap_err();
     assert!(format!("{}", err).contains("User hook script is empty"));
 }
+
+#[test]
+fn cargo_fmt_write_has_precedence_over_classic() {
+    let root = cargo_project_for("cargo-fmt-write-precedence");
+    let mut cargo_toml = open_cargo_toml(&root);
+    writeln!(
+        cargo_toml,
+        "default-features = false\nfeatures = [\"precommit-hook\", \"run-cargo-fmt\", \"run-cargo-fmt-write\"]"
+    ).unwrap();
+    run_cargo(&root, &["test"]).unwrap();
+
+    assert_eq!(get_hook_script(&root, "pre-push"), None);
+
+    let script = get_hook_script(&root, "pre-commit").unwrap();
+    assert!(script.lines().all(|l| l != "cargo test"));
+    assert_eq!(
+        script
+            .lines()
+            .filter(|l| l.starts_with("cargo fmt"))
+            .count(),
+        1
+    );
+}

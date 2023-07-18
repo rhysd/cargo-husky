@@ -38,7 +38,7 @@ impl fmt::Debug for Error {
             Error::OutDir(env::VarError::NotUnicode(msg)) => msg.to_string_lossy().to_string(),
             Error::InvalidUserHooksDir(path) => {
                 format!("User hooks directory is not found or no executable file is found in '{:?}'. Did you forget to make a hook script executable?", path)
-	        }
+            }
             Error::EmptyUserHook(path) => format!("User hook script is empty: {:?}", path),
         };
         write!(f, "{}", msg)
@@ -138,7 +138,9 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
         if cfg!(feature = "run-cargo-clippy") {
             s += cmd!("cargo clippy", "-D warnings");
         }
-        if cfg!(feature = "run-cargo-fmt") {
+        if cfg!(feature = "run-cargo-fmt-write") {
+            s += cmd!("cargo fmt");
+        } else if cfg!(feature = "run-cargo-fmt") {
             s += cmd!("cargo fmt", "--check");
         }
         s
