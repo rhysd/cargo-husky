@@ -14,7 +14,7 @@ repository.
 
 ## Usage
 
-Please add the `cargo-husky` crate to `[dev-dependencies]` section of your project's `Cargo.toml`.
+Please add the `cargo-husky` crate to the `[dev-dependencies]` section of your project's `Cargo.toml`.
 
 ```toml
 [dev-dependencies]
