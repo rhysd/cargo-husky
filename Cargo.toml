@@ -10,7 +10,7 @@ keywords = ["git", "hook", "cargo"]
 categories = ["development-tools"]
 license = "MIT"
 build = "build.rs"
-include = ["build.rs", "LICENSE.txt", "Cargo.toml", "src/**/*.rs"]
+include = ["build.rs", "LICENSE.txt", "README.md", "Cargo.toml", "src/**/*.rs"]
 
 [package.metadata.release]
 no-dev-version = true
