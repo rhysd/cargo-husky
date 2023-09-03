@@ -154,6 +154,17 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
 #
 
 set -e
+
+echo '+git stash --keep-index'
+git stash --keep-index
+
+exit_trap() {{
+        echo '+git stash pop --index'
+        git stash pop --index
+}}
+
+trap "exit_trap" EXIT INT TERM
+
 {}"#,
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_HOMEPAGE"),
