@@ -141,6 +141,9 @@ fn write_script<W: io::Write>(w: &mut W) -> Result<()> {
         if cfg!(feature = "run-cargo-fmt") {
             s += cmd!("cargo fmt", "--check");
         }
+        if cfg!(feature = "run-cargo-doc") {
+            s += cmd!("RUSTDOCFLAGS=\"-D warnings\" cargo doc --no-deps");
+        }
         s
     };
 
