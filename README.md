@@ -120,7 +120,7 @@ features = ["user-hooks"]
 cargo-husky inserts an information header to copied hook files in `.git/hooks/` in order to detect
 self version update.
 
-Note that, when `user-hooks` feature is enabled, other all features are disabled. You need to prepare
+Note that, when `user-hooks` feature is enabled, all other features are disabled. You need to prepare
 all hooks in `.cargo-husky/hooks` directory.
 
 
