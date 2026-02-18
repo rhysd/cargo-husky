@@ -410,14 +410,14 @@ fn user_hooks() {
     assert!(hook_path(&root, "post-merge").is_file());
 
     let check_line = format!(
-        "# This hook was set by cargo-husky v{}: {}",
+        "# This hook was set by cargo-husky v{}: {} (content hash: ",
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_HOMEPAGE")
     );
 
     let s = get_hook_script(&root, "pre-commit").unwrap();
     assert_eq!(s.lines().nth(0), Some("#! /bin/sh"));
-    assert_eq!(s.lines().nth(2), Some(check_line.as_str()));
+    assert!(s.lines().nth(2).unwrap().starts_with(check_line.as_str()));
     assert_eq!(
         s.lines().nth(4),
         Some("# This is a user script for pre-commit hook with shebang")
@@ -425,7 +425,7 @@ fn user_hooks() {
 
     let s = get_hook_script(&root, "post-merge").unwrap();
     assert_eq!(s.lines().nth(0), Some("#"));
-    assert_eq!(s.lines().nth(2), Some(check_line.as_str()));
+    assert!(s.lines().nth(2).unwrap().starts_with(check_line.as_str()));
     assert_eq!(
         s.lines().nth(3),
         Some("# Script without shebang (I'm not sure this is useful)")
